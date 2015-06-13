@@ -97,7 +97,7 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
 
     private void setUpPolyline(){
     // Instantiates a new Polyline object and adds points to define a rectangle
-
+        //linea que no hace nada
     PolylineOptions rectOptions = new PolylineOptions()
             .add(new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude()))
             .add(new LatLng(mMap.getMyLocation().getLatitude() + 1, mMap.getMyLocation().getLongitude()))
