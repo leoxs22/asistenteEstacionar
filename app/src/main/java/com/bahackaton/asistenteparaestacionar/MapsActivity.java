@@ -1,29 +1,48 @@
 package com.bahackaton.asistenteparaestacionar;
 
+import android.app.Activity;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends Activity implements OnMapReadyCallback {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    @Override
+   /* @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         mMap.setMyLocationEnabled(true);
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+
+
+
+    }*/
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
     }
+
 
     @Override
     protected void onResume() {
@@ -50,16 +69,17 @@ public class MapsActivity extends FragmentActivity {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            //mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+             //       .getMap(this);
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
             }
         }
     }
-    public void onMapReady(GoogleMap mMap){
-        Log.d("asd", "crasheo");
+    public void onMapReady(GoogleMap map){
+        mMap=map;
+        mMap.setMyLocationEnabled(true);
         setUpPolyline();
     }
     /**
@@ -77,6 +97,7 @@ public class MapsActivity extends FragmentActivity {
 
     private void setUpPolyline(){
     // Instantiates a new Polyline object and adds points to define a rectangle
+
     PolylineOptions rectOptions = new PolylineOptions()
             .add(new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude()))
             .add(new LatLng(mMap.getMyLocation().getLatitude() + 1, mMap.getMyLocation().getLongitude()))
