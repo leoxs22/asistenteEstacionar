@@ -1,9 +1,12 @@
 package com.bahackaton.asistenteparaestacionar;
 
 import android.app.Activity;
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -13,6 +16,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+
 
 public class MapsActivity extends Activity implements OnMapReadyCallback {
 
@@ -69,18 +73,20 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            //mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-             //       .getMap(this);
+            MapFragment mapFragment = (MapFragment) getFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-                setUpMap();
+
             }
         }
     }
     public void onMapReady(GoogleMap map){
         mMap=map;
         mMap.setMyLocationEnabled(true);
-        setUpPolyline();
+        setUpMap();
+
     }
     /**
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
@@ -89,13 +95,41 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        agregarMarcador(0, 0, "marcador");
+        Button btnMarcador = (Button) findViewById(R.id.markerButton);
+        btnMarcador.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refrescarMarcadores();
+            }
+        });
 
 
     }
 
-    private void setUpPolyline(){
+    private void refrescarMarcadores() {
+        Location pos = mMap.getMyLocation();
+        double lat = pos.getLatitude();
+        double lon = pos.getLongitude();
+        mMap.clear();
+        agregarMarcadoresEn(lat, lon);
+    }
+
+    private void agregarMarcadoresEn(double lat, double lon) {
+        //para testeo
+        agregarMarcador(lat+0.0000001,lon,"1");
+        agregarMarcador(lat+0.0000001,lon+0.0000001,"2");
+        agregarMarcador(lat,lon+0.0000001,"3");
+
+    }
+
+    private void agregarMarcador(double lat, double lon,String title){
+        mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lon)).title(title));
+
+    }
+
+    /*private void setUpPolyline(){
     // Instantiates a new Polyline object and adds points to define a rectangle
         //linea que no hace nada
     PolylineOptions rectOptions = new PolylineOptions()
@@ -105,7 +139,8 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
             .add(new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude()));
 
     // Get back the mutable Polyline
-    Polyline polyline = mMap.addPolyline(rectOptions);}
+    Polyline polyline = mMap.addPolyline(rectOptions);
+    }*/
 
 
 
