@@ -7,20 +7,26 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MapsActivity extends Activity implements OnMapReadyCallback {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private List<Marcador> marcadores = new ArrayList<Marcador>();
 
    /* @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +102,7 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
      */
     private void setUpMap() {
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        agregarMarcador(0, 0, "marcador");
+
         Button btnMarcador = (Button) findViewById(R.id.markerButton);
         btnMarcador.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,7 +110,38 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
                 refrescarMarcadores();
             }
         });
+        Button btnEstacionarDer = (Button) findViewById(R.id.btnEstacionarDer);
+        btnEstacionarDer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refrescarMarcadores();
+                calcularEstacionado(Vereda.getIzquierda());
+            }
+        });
+        Button btnEstacionarIzq = (Button) findViewById(R.id.btnEstacionarIzq);
+        btnEstacionarIzq.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refrescarMarcadores();
+                calcularEstacionado(Vereda.getDerecha());
+            }
+        });
 
+
+    }
+
+    private void calcularEstacionado(int vereda) {
+        boolean puede = true;
+        double lat= mMap.getMyLocation().getLatitude();
+        double lon = mMap.getMyLocation().getLongitude();
+        for(int i=0; i<marcadores.size();i++){
+            if(marcadores.get(i).puedeEstacionar(lat,lon,vereda)==false){
+                Toast.makeText(getApplicationContext(),"No puede estacionar aquí",Toast.LENGTH_LONG).show();
+                break;
+            }else{
+                Toast.makeText(getApplicationContext(),"Puede estacionar libremente aquí",Toast.LENGTH_LONG).show();
+            }
+        };
 
     }
 
@@ -118,14 +155,20 @@ public class MapsActivity extends Activity implements OnMapReadyCallback {
 
     private void agregarMarcadoresEn(double lat, double lon) {
         //para testeo
-        agregarMarcador(lat+0.0000001,lon,"1");
-        agregarMarcador(lat+0.0000001,lon+0.0000001,"2");
-        agregarMarcador(lat,lon+0.0000001,"3");
+        agregarMarcador(lat+0.001,lon,"1",Vereda.cualquiera,0.001);
+        agregarMarcador(lat+0.001,lon+0.001,"2",Vereda.cualquiera,0.001);
+        agregarMarcador(lat,lon+0.001,"3",Vereda.cualquiera,0.001);
+        agregarMarcador(-34.590910, -58.393008,"asd",Vereda.derecha,0.001);
+        agregarMarcador(-34.585873, -58.393936,"asd",Vereda.derecha,0.001);
+
+
 
     }
 
-    private void agregarMarcador(double lat, double lon,String title){
-        mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lon)).title(title));
+    private void agregarMarcador(double lat, double lon,String title, int vereda,double radio){
+        MarkerOptions marcador = new MarkerOptions().position(new LatLng(lat,lon)).title(title);
+        mMap.addMarker(marcador);
+        marcadores.add(new Marcador(marcador,radio, vereda, lat, lon));
 
     }
 
